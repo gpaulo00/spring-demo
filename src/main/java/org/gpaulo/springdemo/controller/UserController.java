@@ -1,14 +1,11 @@
 package org.gpaulo.springdemo.controller;
 
-import java.util.Arrays;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import org.gpaulo.springdemo.models.User;
 import org.gpaulo.springdemo.repos.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class UserController {
@@ -24,45 +21,21 @@ public class UserController {
         this.repository = userRepository;
     }
 
-    @RequestMapping("/save")
-    public String process() {
+    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    public User insert(@RequestBody User input) {
         // save a single user
-        repository.save(new User("Gustavo", "Paulo"));
-
-        // save a list of Customers
-        repository.saveAll(Arrays.asList(
-                new User("Jhonny", "Paulo"),
-                new User("Estheban", "Paulo"),
-                new User("Rossmy", "Segura")
-        ));
-
-        return "Done";
+        return repository.save(input);
     }
 
-    @RequestMapping("/findall")
-    public String findAll() {
-        StringBuilder result = new StringBuilder();
-
-        for (User u : repository.findAll()) {
-            result.append(u.toString()).append("<br>");
-        }
-
-        return result.toString();
+    @RequestMapping(value = "/users", method = RequestMethod.GET)
+    public Iterable<User> findAll() {
+        return repository.findAll();
     }
 
-    @RequestMapping("/findbyid")
-    public String findById(@RequestParam("id") long id) {
-        return repository.findById(id).toString();
-    }
-
-    @RequestMapping("/findbylastname")
-    public String fetchDataByLastName(@RequestParam("lastname") String lastName) {
-        StringBuilder result = new StringBuilder();
-
-        for (User u : repository.findByLastName(lastName)) {
-            result.append(u.toString()).append("<br>");
-        }
-
-        return result.toString();
+    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    public ResponseEntity<User> findById(@PathVariable long id) {
+        return repository.findById(id)
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
     }
 }

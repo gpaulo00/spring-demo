@@ -1,4 +1,7 @@
+
+# Build Tools
 target/
+.gradle/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
