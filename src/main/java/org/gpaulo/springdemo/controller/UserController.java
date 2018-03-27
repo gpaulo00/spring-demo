@@ -3,10 +3,12 @@ package org.gpaulo.springdemo.controller;
 import org.gpaulo.springdemo.models.User;
 import org.gpaulo.springdemo.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Optional;
+
+@RequestMapping("/users")
 @RestController
 public class UserController {
     private UserRepository repository;
@@ -21,21 +23,43 @@ public class UserController {
         this.repository = userRepository;
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.POST)
+    @PostMapping
     public User insert(@RequestBody User input) {
         // save a single user
         return repository.save(input);
     }
 
-    @RequestMapping(value = "/users", method = RequestMethod.GET)
-    public Iterable<User> findAll() {
-        return repository.findAll();
+    @GetMapping
+    public Iterable<User> search(@RequestParam Optional<String> query) {
+        return query
+            .map((String q) -> repository.search(q))
+            .orElseGet(() -> repository.findAll());
     }
 
-    @RequestMapping(value = "/users/{id}", method = RequestMethod.GET)
+    @GetMapping("/{id}")
     public ResponseEntity<User> findById(@PathVariable long id) {
         return repository.findById(id)
             .map(ResponseEntity::ok)
-            .orElseGet(() -> new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Object> deleteById(@PathVariable long id) {
+        return repository.findById(id)
+            .map((User u) -> {
+                repository.delete(u);
+                return ResponseEntity.noContent().build();
+            })
+            .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<User> updateById(@PathVariable long id, @RequestBody User input) {
+        if (!repository.existsById(id)) {
+            return ResponseEntity.notFound().build();
+        }
+        input.setId(id);
+        repository.save(input);
+        return ResponseEntity.noContent().build();
     }
 }
