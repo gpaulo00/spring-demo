@@ -11,7 +11,7 @@
       <template slot="no-data">
         <span class="text-xs-center" v-if="error === null">No hay ningún usuario en el sistema.</span>
         <v-alert v-else type="error" :value="true">
-          <strong>Error al obtener datos</strong>: {{error.message}}
+          <strong>Error al obtener datos</strong>: {{error}}
         </v-alert>
       </template>
     </v-data-table>
@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import axios from 'axios'
+import { mapState, mapActions } from 'vuex'
 
 export default {
   data() {
@@ -30,21 +30,21 @@ export default {
         { text: 'Apellido', value: 'lastName' },
         { text: 'Edad', value: 'age' },
       ],
-      users: [],
-      error: null,
-      loading: true,
     }
   },
+  computed: mapState({
+    users: store => store.users,
+    loading: store => store.usersLoading,
+    error: store => store.usersError,
+    requested: store => store.usersRequested,
+  }),
   methods: {
-    query(input) {
-      axios.get('/users', { params: { input } })
-        .then((res) => { this.users = res.data })
-        .catch((err) => { this.error = err })
-        .then(() => { this.loading = false })
-    },
+    ...mapActions(['search']),
   },
   created() {
-    this.query()
+    if (!this.requested) {
+      this.search()
+    }
   },
 }
 </script>
