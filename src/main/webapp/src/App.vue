@@ -3,6 +3,7 @@
     <v-toolbar app dark color="primary">
       <v-toolbar-title v-text="title"></v-toolbar-title>
       <v-spacer></v-spacer>
+      <v-text-field label="Search" append-icon="search" hide-details single-line></v-text-field>
     </v-toolbar>
     <v-content>
       <router-view></router-view>
