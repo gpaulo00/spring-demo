@@ -27,6 +27,7 @@ module.exports = {
     // don't require .vue extension when importing
     'import/extensions': ['error', 'always', {
       js: 'never',
+      ts: 'never',
       vue: 'never'
     }],
     // disallow reassignment of function parameters

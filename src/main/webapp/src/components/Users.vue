@@ -18,10 +18,12 @@
   </v-container>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
+import { RootState } from '../types'
 
-export default {
+export default Vue.extend({
   data() {
     return {
       headers: [
@@ -33,10 +35,10 @@ export default {
     }
   },
   computed: mapState({
-    users: store => store.users,
-    loading: store => store.usersLoading,
-    error: store => store.usersError,
-    requested: store => store.usersRequested,
+    users: (store: RootState) => store.users,
+    loading: (store: RootState) => store.usersLoading,
+    error: (store: RootState) => store.usersError,
+    requested: (store: RootState) => store.usersRequested,
   }),
   methods: {
     ...mapActions(['search']),
@@ -46,5 +48,5 @@ export default {
       this.search()
     }
   },
-}
+})
 </script>

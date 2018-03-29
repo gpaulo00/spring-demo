@@ -22,10 +22,11 @@
   </v-app>
 </template>
 
-<script>
+<script lang="ts">
+import Vue from 'vue'
 import { mapActions } from 'vuex'
 
-export default {
+export default Vue.extend({
   data() {
     return {
       title: 'SpringBoot Demo',
@@ -42,5 +43,5 @@ export default {
     ...mapActions(['search']),
   },
   name: 'App',
-}
+})
 </script>
