@@ -9,14 +9,13 @@ function resolve (dir) {
 }
 
 const createLintingRule = () => ({
-  test: /\.(js|vue)$/,
-  loader: 'eslint-loader',
+  test: /\.tsx?$/,
+  loader: 'tslint-loader',
   enforce: 'pre',
-  include: [resolve('src'), resolve('test')],
   options: {
-    formatter: require('eslint-friendly-formatter'),
-    emitWarning: !config.dev.showEslintErrorsInOverlay
-  }
+    formattersDirectory: 'node_modules/custom-tslint-formatters/formatters',
+    formatter: 'grouped',
+  },
 })
 
 module.exports = {
@@ -40,7 +39,7 @@ module.exports = {
   },
   module: {
     rules: [
-      ...(config.dev.useEslint ? [createLintingRule()] : []),
+      ...(config.dev.useTslint ? [createLintingRule()] : []),
       {
         test: /\.ts$/,
         exclude: /node_modules|vue\/src/,

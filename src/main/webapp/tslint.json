@@ -8,5 +8,13 @@
     "rules": {
       "semicolon": [true, "never"]
     },
-    "rulesDirectory": []
+    "rulesDirectory": [],
+    "linterOptions": {
+      "exclude": [
+        "/build/",
+        "/config/",
+        "/dist/",
+        "/node"
+      ]
+    }
 }
