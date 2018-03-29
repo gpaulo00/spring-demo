@@ -7,7 +7,9 @@ import java.io.Serializable;
 @Entity
 @Table(name = "users")
 public class User implements Serializable {
-    @Id
+    private static final long serialVersionUID = 1709299723906950395L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 

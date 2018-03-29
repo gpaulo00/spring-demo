@@ -38,7 +38,7 @@ yarn-error.log*
 
 ### NetBeans ###
 nbproject/private/
-build/
+/build/
 nbbuild/
 dist/
 nbdist/
