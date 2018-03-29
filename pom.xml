@@ -68,14 +68,6 @@
 	</dependencies>
 
 	<build>
-        <!-- copy the frontend -->
-        <resources>
-            <resource>
-                <directory>${frontend.dir}/dist</directory>
-                <targetPath>${basedir}/target/classes/static</targetPath>
-            </resource>
-        </resources>
-
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -89,19 +81,21 @@
                 <version>1.6</version>
                 <executions>
                     <execution>
+                        <phase>package</phase>
                         <id>install node and yarn</id>
                         <goals>
                             <goal>install-node-and-yarn</goal>
                         </goals>
-                        <phase>generate-resources</phase>
                     </execution>
                     <execution>
+                        <phase>package</phase>
                         <id>yarn install</id>
                         <goals>
                             <goal>yarn</goal>
                         </goals>
                     </execution>
                     <execution>
+                        <phase>package</phase>
                         <id>yarn build</id>
                         <goals>
                             <goal>yarn</goal>
@@ -116,6 +110,28 @@
                     <nodeVersion>${node.version}</nodeVersion>
                     <yarnVersion>${yarn.version}</yarnVersion>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.0.2</version>
+                <executions>
+                    <execution>
+                        <id>copy-resources</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${basedir}/target/classes/static</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${frontend.dir}/dist</directory>
+                                    <filtering>false</filtering>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
 	</build>
