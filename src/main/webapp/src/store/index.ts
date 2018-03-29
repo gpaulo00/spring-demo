@@ -1,22 +1,22 @@
 
+import axios from 'axios'
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { MutationTree, ActionTree } from 'vuex'
-import axios from 'axios'
+import { ActionTree, MutationTree } from 'vuex'
 
-import { User, RootState } from '../types'
+import { IRootState, IUser } from '../types'
 
 Vue.use(Vuex)
 
-const state: RootState = {
+const state: IRootState = {
   users: [],
   usersError: null,
   usersLoading: false,
   usersRequested: false,
 }
 
-const mutations: MutationTree<RootState> = {
-  setUsers(store, users: User[]) {
+const mutations: MutationTree<IRootState> = {
+  setUsers(store, users: IUser[]) {
     store.users = users
     store.usersLoading = false
   },
@@ -25,11 +25,11 @@ const mutations: MutationTree<RootState> = {
     store.usersLoading = false
   },
   setLoading(store) {
-    store.usersLoading = true
+    store.usersLoading   = true
   },
 }
 
-const actions: ActionTree<RootState, any> = {
+const actions: ActionTree<IRootState, any> = {
   async search({ commit }, query: string) {
     commit('setLoading')
     try {
@@ -41,8 +41,8 @@ const actions: ActionTree<RootState, any> = {
   },
 }
 
-export default new Vuex.Store<RootState>({
-  state,
+export default new Vuex.Store<IRootState>({
   actions,
   mutations,
+  state,
 })

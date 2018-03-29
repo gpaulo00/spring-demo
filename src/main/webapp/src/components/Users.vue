@@ -21,7 +21,7 @@
 <script lang="ts">
 import Vue from 'vue'
 import { mapState, mapActions } from 'vuex'
-import { RootState } from '../types'
+import { IRootState } from '../types'
 
 export default Vue.extend({
   data() {
@@ -35,10 +35,10 @@ export default Vue.extend({
     }
   },
   computed: mapState({
-    users: (store: RootState) => store.users,
-    loading: (store: RootState) => store.usersLoading,
-    error: (store: RootState) => store.usersError,
-    requested: (store: RootState) => store.usersRequested,
+    users: (store: IRootState) => store.users,
+    loading: (store: IRootState) => store.usersLoading,
+    error: (store: IRootState) => store.usersError,
+    requested: (store: IRootState) => store.usersRequested,
   }),
   methods: {
     ...mapActions(['search']),

@@ -12,17 +12,17 @@ import store from './store'
 
 Vue.use(Vuetify, {
   theme: {
-    primary: colors.indigo.base,
     accent: colors.pink.accent2,
+    primary: colors.indigo.base,
   },
 })
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
+// tslint:disable-next-line:no-unused-expression
 new Vue({
+  components: { App },
   el: '#app',
   router,
   store,
-  components: { App },
   template: '<App/>',
 })

@@ -1,13 +1,13 @@
 
-export interface User {
+export interface IUser {
   id: number,
-  firstName: String,
-  lastName: String,
+  firstName: string,
+  lastName: string,
   age: number,
 }
 
-export interface RootState {
-  users: User[],
+export interface IRootState {
+  users: IUser[],
   usersError: string|null,
   usersLoading: boolean,
   usersRequested: boolean,
