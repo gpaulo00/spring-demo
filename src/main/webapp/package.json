@@ -8,7 +8,8 @@
     "dev": "webpack-dev-server --inline --progress --config build/webpack.dev.conf.js",
     "start": "yarn dev",
     "lint": "tslint -p . -s node_modules/custom-tslint-formatters/formatters -t grouped",
-    "build": "node build/build.js"
+    "build": "node build/build.js",
+    "prettier": "prettier --write 'src/**/*.{vue,ts}'"
   },
   "dependencies": {
     "axios": "^0.18.0",
@@ -42,6 +43,7 @@
     "postcss-import": "^11.0.0",
     "postcss-loader": "^2.0.8",
     "postcss-url": "^7.2.1",
+    "prettier": "1.11.1",
     "rimraf": "^2.6.0",
     "semver": "^5.3.0",
     "shelljs": "^0.7.6",

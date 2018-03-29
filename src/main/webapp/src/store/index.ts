@@ -1,4 +1,3 @@
-
 import axios from 'axios'
 import Vue from 'vue'
 import Vuex from 'vuex'
@@ -25,7 +24,7 @@ const mutations: MutationTree<IRootState> = {
     store.usersLoading = false
   },
   setLoading(store) {
-    store.usersLoading   = true
+    store.usersLoading = true
   },
 }
 
