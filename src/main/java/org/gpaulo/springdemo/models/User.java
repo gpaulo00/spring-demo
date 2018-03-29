@@ -31,6 +31,10 @@ public class User implements Serializable {
     this.age = age;
   }
 
+  public String toString() {
+    return "User[" + firstName + ", " + lastName + ", " + age + "]";
+  }
+
   public String getLastName() {
     return lastName;
   }
