@@ -1,65 +1,60 @@
-package org.gpaulo.springdemo.controller;
+package org.gpaulo.springdemo.controllers;
 
 import java.util.Optional;
 import org.gpaulo.springdemo.models.User;
-import org.gpaulo.springdemo.repos.UserRepository;
+import org.gpaulo.springdemo.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.RequestEntity.HeadersBuilder;
 import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/users")
 @RestController
 public class UserController {
-  private UserRepository repository;
+  private UserService userService;
 
   /**
    * Setup the UserController
    *
-   * @param userRepository UserRepository impl.
+   * @param userService UserService
    */
   @Autowired
-  public UserController(UserRepository userRepository) {
-    this.repository = userRepository;
+  public UserController(UserService userService) {
+    this.userService = userService;
   }
 
   @PostMapping
   public User insert(@RequestBody User input) {
     // save a single user
-    return repository.save(input);
+    return userService.save(input);
   }
 
   @GetMapping
   public Iterable<User> search(@RequestParam Optional<String> query) {
-    return query.map((String q) -> repository.search(q)).orElseGet(() -> repository.findAll());
+    return userService.list(query);
   }
 
   @GetMapping("/{id}")
   public ResponseEntity<User> findById(@PathVariable long id) {
-    return repository
-        .findById(id)
+    return userService
+        .get(id)
         .map(ResponseEntity::ok)
         .orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @DeleteMapping("/{id}")
   public ResponseEntity<Object> deleteById(@PathVariable long id) {
-    return repository
-        .findById(id)
-        .map(
-            (User u) -> {
-              repository.delete(u);
-              return ResponseEntity.noContent().build();
-            })
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    if (userService.delete(id)) {
+      return ResponseEntity.noContent().build();
+    }
+    return ResponseEntity.notFound().build();
   }
 
   @PutMapping("/{id}")
   public ResponseEntity<User> updateById(@PathVariable long id, @RequestBody User input) {
-    if (!repository.existsById(id)) {
-      return ResponseEntity.notFound().build();
-    }
-    input.setId(id);
-    repository.save(input);
-    return ResponseEntity.noContent().build();
+    return userService
+      .update(id, input)
+      .map(ResponseEntity::ok)
+      .orElseGet(() -> ResponseEntity.notFound().build());
   }
 }
