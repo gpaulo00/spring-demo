@@ -1,6 +1,7 @@
 package org.gpaulo.springdemo.services;
 
 import static org.assertj.core.api.Assertions.*;
+import static org.mockito.BDDMockito.*;
 
 import java.util.Arrays;
 import java.util.Optional;
@@ -10,7 +11,6 @@ import org.gpaulo.springdemo.repos.UserRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -41,27 +41,27 @@ public class UserDAOTest {
     @MockBean
     private UserRepository userRepo;
 
-    User gus = new User("Gustavo", "Paulo", 17);
-    User jh = new User("Jhonny", "Paulo", 39);
-    User john = new User("John", "Doe", 30);
+    private final User gus = new User("Gustavo", "Paulo", 17);
+    private final User jh = new User("Jhonny", "Paulo", 39);
+    private final User john = new User("John", "Doe", 30);
 
     @Before
     public void setUp() {
         // save
-        Mockito.when(userRepo.save(gus)).thenReturn(gus);
+        given(userRepo.save(gus)).willReturn(gus);
 
         // list
-        Mockito.when(userRepo.findAll()).thenReturn(Arrays.asList(gus, john));
-        Mockito.when(userRepo.search("gus")).thenReturn(Arrays.asList(gus));
+        given(userRepo.findAll()).willReturn(Arrays.asList(gus, john));
+        given(userRepo.search("gus")).willReturn(Arrays.asList(gus));
 
         // get
-        Mockito.when(userRepo.findById(1L)).thenReturn(Optional.of(gus));
-        Mockito.when(userRepo.findById(100L)).thenReturn(Optional.empty());
+        given(userRepo.findById(1L)).willReturn(Optional.of(gus));
+        given(userRepo.findById(100L)).willReturn(Optional.empty());
 
         // update
-        Mockito.when(userRepo.existsById(2L)).thenReturn(true);
-        Mockito.when(userRepo.existsById(100L)).thenReturn(false);
-        Mockito.when(userRepo.save(jh)).thenReturn(jh);
+        given(userRepo.existsById(2L)).willReturn(true);
+        given(userRepo.existsById(100L)).willReturn(false);
+        given(userRepo.save(jh)).willReturn(jh);
     }
 
     @Test
