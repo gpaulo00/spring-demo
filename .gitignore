@@ -4,6 +4,24 @@ target/
 .gradle/
 !.mvn/wrapper/maven-wrapper.jar
 
+# Common
+.DS_Store
+
+# NodeJS
+node_modules/
+node/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Editor directories and files
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+/.attach_*
+
 ### STS ###
 .apt_generated
 .classpath
@@ -11,6 +29,7 @@ target/
 .project
 .settings
 .springBeans
+.sts4-cache/
 
 ### IntelliJ IDEA ###
 .idea
@@ -20,7 +39,7 @@ target/
 
 ### NetBeans ###
 nbproject/private/
-build/
+/build/
 nbbuild/
 dist/
 nbdist/
