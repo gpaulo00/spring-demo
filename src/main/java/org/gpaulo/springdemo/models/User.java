@@ -13,13 +13,22 @@ public class User implements Serializable {
   @GeneratedValue(strategy = GenerationType.AUTO)
   private long id;
 
-  @NotNull @NotEmpty @Column private String firstName;
+  @NotNull
+  @NotEmpty
+  @Column
+  private String firstName;
 
-  @NotNull @NotEmpty @Column private String lastName;
+  @NotNull
+  @NotEmpty
+  @Column
+  private String lastName;
 
-  @Positive @Column private int age;
+  @Positive
+  @Column
+  private int age;
 
-  protected User() {}
+  protected User() {
+  }
 
   public User(String firstName, String lastName) {
     this(firstName, lastName, 1);

@@ -1,7 +1,6 @@
 package org.gpaulo.springdemo.controllers;
 
 import static org.mockito.BDDMockito.*;
-import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -17,7 +16,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -26,14 +24,13 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(UserController.class)
-@AutoConfigureRestDocs(outputDir = "target/snippets")
 public class UserControllerTest {
     private final String path = "/users";
     private final String singlePath = this.path + "/{id}";
 
     @Autowired
     private MockMvc mvc;
- 
+
     @MockBean
     private UserService service;
 
@@ -46,7 +43,7 @@ public class UserControllerTest {
     @Before
     public void setUp() {
         // post
-        given(service.save((User)notNull())).willReturn(gus);
+        given(service.save((User) notNull())).willReturn(gus);
 
         // get
         given(service.get(1)).willReturn(Optional.of(gus));
@@ -62,31 +59,21 @@ public class UserControllerTest {
     }
 
     @Test
-    public void whenPost_thenInsertUser()
-    throws Exception {
+    public void whenPost_thenInsertUser() throws Exception {
         // given
         String body = json.writeValueAsString(gus);
 
         // assert
-        mvc.perform(post(path)
-            .characterEncoding("UTF-8")
-            .content(body)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().json(body))
-            .andDo(document("user-create"));
-        
+        mvc.perform(post(path).characterEncoding("UTF-8").content(body).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(content().json(body));
+
         // asert (invalid input)
-        mvc.perform(post(path)
-            .characterEncoding("UTF-8")
-            .content(invalid)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isBadRequest());
+        mvc.perform(post(path).characterEncoding("UTF-8").content(invalid).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    public void whenGetUsers_thenReturnSearchResults()
-    throws Exception {
+    public void whenGetUsers_thenReturnSearchResults() throws Exception {
         // given
         String query = "Pau";
         String search = this.path + "?query={q}";
@@ -99,88 +86,56 @@ public class UserControllerTest {
 
         // when has query
         given(service.list(any())).willReturn(allUsers);
-        mvc.perform(get(search, query)
-            .characterEncoding("UTF-8")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().json(body))
-            .andDo(document("user-search"));
-        
+        mvc.perform(get(search, query).characterEncoding("UTF-8").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(content().json(body));
+
         // when has not query
-        mvc.perform(get(path)
-            .characterEncoding("UTF-8")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().json(body))
-            .andDo(document("user-list"));
-        
+        mvc.perform(get(path).characterEncoding("UTF-8").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(content().json(body));
+
         // when invalid
         given(service.list(any())).willReturn(empty);
-        mvc.perform(get(search, invalid)
-            .characterEncoding("UTF-8")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().json(bad));
+        mvc.perform(get(search, invalid).characterEncoding("UTF-8").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(content().json(bad));
     }
 
     @Test
-    public void whenGetID_thenFindUser()
-    throws Exception {
+    public void whenGetID_thenFindUser() throws Exception {
         // given
         String body = json.writeValueAsString(gus);
 
         // when exists
-        mvc.perform(get(singlePath, 1)
-            .characterEncoding("UTF-8")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().json(body))
-            .andDo(document("user-get"));
+        mvc.perform(get(singlePath, 1).characterEncoding("UTF-8").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(content().json(body));
 
         // when does not exist
-        mvc.perform(get(singlePath, 100)
-            .characterEncoding("UTF-8")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound());
+        mvc.perform(get(singlePath, 100).characterEncoding("UTF-8").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    public void whenDeleteID_thenRemoveUser()
-    throws Exception {
+    public void whenDeleteID_thenRemoveUser() throws Exception {
         // when exists
-        mvc.perform(delete(singlePath, 2)
-            .characterEncoding("UTF-8")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent())
-            .andDo(document("user-delete"));
+        mvc.perform(delete(singlePath, 2).characterEncoding("UTF-8").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNoContent());
 
         // when does not exist
-        mvc.perform(delete(singlePath, 100)
-            .characterEncoding("UTF-8")
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound());
+        mvc.perform(delete(singlePath, 100).characterEncoding("UTF-8").contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
-    public void whenUpdateID_thenUpdateUser()
-    throws Exception {
+    public void whenUpdateID_thenUpdateUser() throws Exception {
         // given
         String body = json.writeValueAsString(jh);
 
         // when exists
-        mvc.perform(put(singlePath, 2)
-            .characterEncoding("UTF-8")
-            .content(body)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(content().json(body))
-            .andDo(document("user-update"));
+        mvc.perform(put(singlePath, 2).characterEncoding("UTF-8").content(body).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk()).andExpect(content().json(body));
 
         // when does not exist
-        mvc.perform(put(singlePath, 100)
-            .characterEncoding("UTF-8")
-            .content(body)
-            .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNotFound());
+        mvc.perform(
+                put(singlePath, 100).characterEncoding("UTF-8").content(body).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

@@ -35,10 +35,7 @@ public class UserController {
 
   @GetMapping("/{id}")
   public ResponseEntity<User> findById(@PathVariable long id) {
-    return userService
-        .get(id)
-        .map(ResponseEntity::ok)
-        .orElseGet(() -> ResponseEntity.notFound().build());
+    return userService.get(id).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 
   @DeleteMapping("/{id}")
@@ -51,9 +48,6 @@ public class UserController {
 
   @PutMapping("/{id}")
   public ResponseEntity<User> updateById(@PathVariable long id, @RequestBody User input) {
-    return userService
-      .update(id, input)
-      .map(ResponseEntity::ok)
-      .orElseGet(() -> ResponseEntity.notFound().build());
+    return userService.update(id, input).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
   }
 }
