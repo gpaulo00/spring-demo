@@ -13,7 +13,9 @@ java -jar target/spring-demo-VERSION.jar
 You can get *hot reload* in both the server and the frontend. In order to
 do this, run the main class of the app with your IDE (or using `mvn spring-boot:run`)
 and then run `yarn start` in the `src/main/webapp` folder. Now it's running in the port
-9090.
+
+## Running the Tests
+Run the unit test with `mvn test` and the integration tests with `mvn failsafe:integration-test`.
 
 ## Built With
 * [Java](https://www.java.com/download/) - Programming Language

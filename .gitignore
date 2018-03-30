@@ -20,6 +20,7 @@ yarn-error.log*
 *.ntvs*
 *.njsproj
 *.sln
+/.attach_*
 
 ### STS ###
 .apt_generated
