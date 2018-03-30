@@ -28,7 +28,6 @@ public class UserRepositoryTest {
   @Autowired
   private UserRepository userRepository;
 
-  // write test cases here
   @Profile("test")
   @Test
   public void whenSearch_thenReturnResults() {

@@ -19,6 +19,9 @@ public class UserDAO implements UserService {
   public User save(User u) {
     return userRepo.save(u);
   }
+  public Iterable<User> list() {
+    return this.list(Optional.empty());
+  }
   public Iterable<User> list(Optional<String> query) {
     return query.map((String q) -> userRepo.search(q)).orElseGet(() -> userRepo.findAll());
   }
