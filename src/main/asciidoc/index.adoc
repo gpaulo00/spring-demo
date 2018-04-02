@@ -1,0 +1,102 @@
+:path: /users
+:toc: left
+
+= SpringDemo API v{version}
+
+This **RESTful API** provides a easy way to manage the users in this
+system, using the standard methods of the **HTTP** protocol.
+
+Here I explain how to manage this resource, with a **cURL** example of the request
+and the raw **HTTP** requests.
+
+== Create New Users
+To create some new users, send a **HTTP POST** to `{path}`, with
+the _User_ as a json-encoded object in the request body.
+It should response with a **JSON** object that represents the created user.
+
+=== Response Fields
+
+include::{snippets}/user-create/response-fields.adoc[]
+
+=== Example
+
+include::{snippets}/user-create/curl-request.adoc[]
+
+include::{snippets}/user-create/http-response.adoc[]
+
+== List and Search Users
+To list all the users, send a **HTTP GET** to `{path}`.
+It should response with a *JSON* array that contains all the results.
+
+=== Request Parameters
+
+include::{snippets}/user-search/request-parameters.adoc[]
+
+=== Basic Example
+Without the `query` parameter, it will response with all the users.
+
+include::{snippets}/user-list/curl-request.adoc[]
+
+include::{snippets}/user-list/http-response.adoc[]
+
+=== Search Example
+The `query` parameter is used as a _regular expression_ filter against the user's
+firstname and lastname.
+
+include::{snippets}/user-search/curl-request.adoc[]
+
+include::{snippets}/user-search/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/user-search/response-fields.adoc[]
+
+== Get an User
+To get a single user, send a **HTTP GET** request.
+It should response with **JSON** object that represents the user.
+
+=== Path Parameters
+
+include::{snippets}/user-get/path-parameters.adoc[]
+
+=== Example
+
+include::{snippets}/user-get/curl-request.adoc[]
+
+include::{snippets}/user-get/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/user-get/response-fields.adoc[]
+
+== Delete an User
+To delete a single user, send a **HTTP DELETE** request.
+
+=== Path Parameters
+
+include::{snippets}/user-delete/path-parameters.adoc[]
+
+=== Example
+
+include::{snippets}/user-delete/curl-request.adoc[]
+
+include::{snippets}/user-delete/http-response.adoc[]
+
+== Modify an User
+To modify a single user, send a **HTTP PUT** request, with
+the _User_ as a json-encoded object in the request body.
+It should response with **JSON** object that represents the updated user.
+
+=== Path Parameters
+
+include::{snippets}/user-update/path-parameters.adoc[]
+
+=== Example
+
+include::{snippets}/user-update/curl-request.adoc[]
+
+include::{snippets}/user-update/http-response.adoc[]
+
+=== Response Fields
+
+include::{snippets}/user-update/response-fields.adoc[]
