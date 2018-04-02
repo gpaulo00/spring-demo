@@ -4,6 +4,9 @@ import static io.restassured.RestAssured.*;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.document;
 import static org.springframework.restdocs.restassured3.RestAssuredRestDocumentation.documentationConfiguration;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 
 import java.util.Optional;
 
@@ -20,11 +23,12 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.web.server.LocalServerPort;
 import org.springframework.restdocs.JUnitRestDocumentation;
+import org.springframework.restdocs.payload.FieldDescriptor;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import io.restassured.builder.RequestSpecBuilder;
@@ -35,152 +39,181 @@ import io.restassured.specification.RequestSpecification;;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT, classes = Application.class)
 @RunWith(SpringRunner.class)
 public class UserControllerIT {
-  @Autowired
-  private UserRepository userRepo;
+    @Autowired
+    private UserRepository userRepo;
 
-  @LocalServerPort
-  private int port;
+    @LocalServerPort
+    private int port;
 
-  @Rule
-  public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
+    @Rule
+    public JUnitRestDocumentation restDocumentation = new JUnitRestDocumentation();
 
-  @Autowired
-  ObjectMapper json;
-  private final User gus = new User("Gustavo", "Paulo", 17);
-  private User jh = new User("Jhonny", "Paulo");
-  private final String USERS_PATH = "/users";
-  private final String USER_PATH = "/users/{id}";
+    @Autowired
+    ObjectMapper json;
+    private final User gus = new User("Gustavo", "Paulo", 17);
+    private User jh = new User("Jhonny", "Paulo");
+    private final String USERS_PATH = "/users";
+    private final String USER_PATH = "/users/{id}";
 
-  private RequestSpecification spec;
+    private RequestSpecification spec;
 
-  @Before
-  public void setUp() {
-    userRepo.deleteAll();
-    jh.setId(1);
-    this.jh = userRepo.save(jh);
-    this.spec = new RequestSpecBuilder().addFilter(documentationConfiguration(this.restDocumentation)).build()
-        .contentType(ContentType.JSON).port(this.port).accept(ContentType.JSON);
-  }
+    /**
+     * Descriptor of a User field
+     */
+    private final FieldDescriptor[] USER_DOC = {
+            fieldWithPath("id").type(JsonFieldType.NUMBER).description("ID of the user"),
+            fieldWithPath("firstName").type(JsonFieldType.STRING).description("First name of the user"),
+            fieldWithPath("lastName").type(JsonFieldType.STRING).description("Last name of the user"),
+            fieldWithPath("age").type(JsonFieldType.NUMBER).description("Age of the user") };
 
-  @After
-  public void cleanUp() {
-    userRepo.deleteAll();
-  }
+    @Before
+    public void setUp() {
+        userRepo.deleteAll();
+        jh.setId(1);
+        this.jh = userRepo.save(jh);
+        this.spec = new RequestSpecBuilder()
+                .addFilter(document("{method-name}/{step}", preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint())))
+                .addFilter(documentationConfiguration(this.restDocumentation)).build().contentType(ContentType.JSON)
+                .port(this.port).accept(ContentType.JSON);
+    }
 
-  @Test
-  public void postUserShouldInsertUser() throws Exception {
-    // given
-    JsonPath res = given(this.spec).filter(document("user-create"))
+    @After
+    public void cleanUp() {
+        userRepo.deleteAll();
+    }
 
-        // when
-        .when().body(gus).post(USERS_PATH)
+    @Test
+    public void postUserShouldInsertUser() throws Exception {
+        // given
+        JsonPath res = given(this.spec)
+                .filter(document("user-create", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
+                        responseFields(USER_DOC)))
 
-        // then
-        .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
+                // when
+                .when().body(gus).post(USERS_PATH)
 
-        // check json
-        .body("firstName", is(gus.getFirstName())).body("lastName", is(gus.getLastName())).body("age", is(gus.getAge()))
-        .body("id", not(is(gus.getId())))
+                // then
+                .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
 
-        // extract
-        .extract().jsonPath();
+                // check json
+                .body("firstName", is(gus.getFirstName())).body("lastName", is(gus.getLastName()))
+                .body("age", is(gus.getAge())).body("id", not(is(gus.getId())))
 
-    // should exist
-    assertThat(userRepo.existsById((long) res.getInt("id"))).isTrue();
-  }
+                // extract
+                .extract().jsonPath();
 
-  @Test
-  public void getUsersShouldReturnAllUsers() throws Exception {
-    // init
-    userRepo.save(gus);
+        // should exist
+        assertThat(userRepo.existsById((long) res.getInt("id"))).isTrue();
+    }
 
-    // given
-    User[] res = given(this.spec).filter(document("user-list"))
+    @Test
+    public void getUsersShouldReturnAllUsers() throws Exception {
+        // init
+        userRepo.save(gus);
 
-        // when
-        .when().get(USERS_PATH)
+        // given
+        User[] res = given(this.spec)
+                .filter(document("user-list", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
+                        responseFields(fieldWithPath("[]").description("An array of users")).andWithPrefix("[].",
+                                USER_DOC)))
 
-        // then
-        .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
+                // when
+                .when().get(USERS_PATH)
 
-        // check json
-        .extract().as(User[].class);
+                // then
+                .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
 
-    // assert
-    assertThat(res.length).isEqualTo(2);
-  }
+                // check json
+                .extract().as(User[].class);
 
-  @Test
-  public void getUsersWithQueryShouldSearchResults() throws Exception {
-    // given
-    User expected = userRepo.save(gus);
-    User[] res = given(this.spec).filter(document("user-search"))
+        // assert
+        assertThat(res.length).isEqualTo(2);
+    }
 
-        // when
-        .when().param("query", "gus").get(USERS_PATH)
+    @Test
+    public void getUsersWithQueryShouldSearchResults() throws Exception {
+        // user doc
 
-        // then
-        .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
+        // given
+        User expected = userRepo.save(gus);
+        User[] res = given(this.spec)
+                .filter(document("user-search", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
+                        responseFields(fieldWithPath("[]").description("An array of users")).andWithPrefix("[].",
+                                USER_DOC),
+                        requestParameters(parameterWithName("query").description("Search query"))))
 
-        // check json
-        .extract().as(User[].class);
+                // when
+                .when().param("query", "gus").get(USERS_PATH)
 
-    // assert
-    assertThat(res.length).isEqualTo(1);
-    assertThat(res[0].getId()).isEqualTo(expected.getId());
-  }
+                // then
+                .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
 
-  @Test
-  public void getUserShouldReturnIt() throws Exception {
-    // given
-    given(this.spec).filter(document("user-get"))
+                // check json
+                .extract().as(User[].class);
 
-        // when
-        .when().get(USER_PATH, jh.getId())
+        // assert
+        assertThat(res.length).isEqualTo(1);
+        assertThat(res[0].getId()).isEqualTo(expected.getId());
+    }
 
-        // then
-        .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
+    @Test
+    public void getUserShouldReturnIt() throws Exception {
+        // given
+        given(this.spec)
+                .filter(document("user-get", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
+                        responseFields(USER_DOC), pathParameters(parameterWithName("id").description("The user's ID"))))
 
-        // check json
-        .body("firstName", is(jh.getFirstName())).body("lastName", is(jh.getLastName())).body("age", is(jh.getAge()))
-        .body("id", is((int) jh.getId()));
-  }
+                // when
+                .when().get(USER_PATH, jh.getId())
 
-  @Test
-  public void deleteUserShouldRemoveIt() throws Exception {
-    // given
-    given(this.spec).filter(document("user-delete"))
+                // then
+                .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
 
-        // when
-        .when().delete(USER_PATH, jh.getId())
+                // check json
+                .body("firstName", is(jh.getFirstName())).body("lastName", is(jh.getLastName()))
+                .body("age", is(jh.getAge())).body("id", is((int) jh.getId()));
+    }
 
-        // then
-        .then().assertThat().statusCode(is(204));
+    @Test
+    public void deleteUserShouldRemoveIt() throws Exception {
+        // given
+        given(this.spec)
+                .filter(document("user-delete", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
+                        pathParameters(parameterWithName("id").description("The user's ID"))))
 
-    // should not exist
-    assertThat(userRepo.existsById(jh.getId())).isFalse();
-  }
+                // when
+                .when().delete(USER_PATH, jh.getId())
 
-  @Test
-  public void updateUserShouldUpdateIt() throws Exception {
-    // given
-    User ros = new User("Rossmy", "Segura");
-    given(this.spec).filter(document("user-update"))
+                // then
+                .then().assertThat().statusCode(is(204));
 
-        // when
-        .when().body(ros).put(USER_PATH, jh.getId())
+        // should not exist
+        assertThat(userRepo.existsById(jh.getId())).isFalse();
+    }
 
-        // then
-        .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
+    @Test
+    public void updateUserShouldUpdateIt() throws Exception {
+        // given
+        User ros = new User("Rossmy", "Segura");
+        given(this.spec)
+                .filter(document("user-update", preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint()),
+                        responseFields(USER_DOC), pathParameters(parameterWithName("id").description("The user's ID"))))
 
-        // check response
-        .body("firstName", is(ros.getFirstName())).body("lastName", is(ros.getLastName()))
-        .body("id", not(is(ros.getId())));
+                // when
+                .when().body(ros).put(USER_PATH, jh.getId())
 
-    // should be updated in database
-    Optional<User> fin = userRepo.findById(jh.getId());
-    assertThat(fin).isPresent();
-    assertThat(fin.get().getFirstName()).isNotEqualTo(jh.getFirstName());
-    assertThat(fin.get().getLastName()).isNotEqualTo(jh.getLastName());
-  }
+                // then
+                .then().assertThat().statusCode(is(200)).contentType(ContentType.JSON)
+
+                // check response
+                .body("firstName", is(ros.getFirstName())).body("lastName", is(ros.getLastName()))
+                .body("id", not(is(ros.getId())));
+
+        // should be updated in database
+        Optional<User> fin = userRepo.findById(jh.getId());
+        assertThat(fin).isPresent();
+        assertThat(fin.get().getFirstName()).isNotEqualTo(jh.getFirstName());
+        assertThat(fin.get().getLastName()).isNotEqualTo(jh.getLastName());
+    }
 }

@@ -83,9 +83,23 @@
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>run-integration-tests</id>
+                        <phase>prepare-package</phase> 
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
 
             <!-- rest docs -->
-            <plugin> 
+            <plugin>
                 <groupId>org.asciidoctor</groupId>
                 <artifactId>asciidoctor-maven-plugin</artifactId>
                 <version>1.5.3</version>
@@ -97,8 +111,13 @@
                             <goal>process-asciidoc</goal>
                         </goals>
                         <configuration>
-                            <backend>html</backend>
-                            <doctype>book</doctype>
+                            <backend>html5</backend>
+                            <sourceHighlighter>coderay</sourceHighlighter>
+                            <attributes>
+                                <version>${project.version}</version>
+                                <snippets>${project.build.directory}/generated-snippets</snippets> 
+                            </attributes>
+                            <outputDirectory>target/generated-docs</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
